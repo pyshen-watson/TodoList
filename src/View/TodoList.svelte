@@ -1,21 +1,23 @@
 <script lang="ts">
-    import Todo from "./Todo.svelte"
+    import TodoItem from "./TodoItem.svelte"
+    import { getTodos } from "../Data/store"
 
-    let todolist = ['Get milk', 'Get banana', 'Go to work']
+
+    let todoPromise = getTodos()
     let taskInput: string
 
     const addTask = () => {
 
-        if(taskInput === ""){
-            alert("Task can't be empty.")
-            return
-        }
+        // if(taskInput === ""){
+        //     alert("Task can't be empty.")
+        //     return
+        // }
 
-        todolist = [taskInput, ...todolist]
-        taskInput = ""
+        // todolist = [taskInput, ...todolist]
+        // taskInput = ""
     }
     const deleteTask = (e:CustomEvent) => {
-        todolist = todolist.filter(task => task!==e.detail)
+        // todolist = todolist.filter(task => task!==e.detail)
     }
     const keypress = (event) => {
         if(event.key === 'Enter'){
@@ -26,15 +28,20 @@
 </script>
 
 <div class="main">
+
     <div>
-        <input type="text" placeholder="Type the task" bind:value={taskInput} autofocus>
+        <input type="text" placeholder="Type the task" bind:value={taskInput}>
         <button on:click={addTask}>Add</button>
     </div>
-    {#each todolist as todo}
-        <Todo task={todo} on:deleteTask={deleteTask}/>
-    {:else}
-        <div class="no-task">No task</div>
-    {/each}
+
+    {#await todoPromise then todolist}
+        {#each todolist as todo}
+            <TodoItem task={todo.task} on:deleteTask={deleteTask}/>
+        {:else}
+            <div class="no-task">No task</div>
+        {/each}
+    {/await}
+
 </div>
 
 <svelte:window on:keydown={keypress} />
