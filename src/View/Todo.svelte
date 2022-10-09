@@ -1,6 +1,14 @@
 <script lang="ts">
+    import { createEventDispatcher } from 'svelte'
+
     export let task:string
     let isCompleted:boolean = false
+
+    const dispatcher = createEventDispatcher()
+    const deleteTask = () => {
+        dispatcher('deleteTask', task)
+    }
+
 </script>
 
 <div class="main">
@@ -9,7 +17,7 @@
     </span>
     <span>
         <i class="fa-solid fa-check done" on:click={() => {isCompleted = !isCompleted}}/>
-        <i class="fa-solid fa-trash-can delete"/>
+        <i class="fa-solid fa-trash-can delete" on:click={deleteTask}/>
     </span>
 </div>
 

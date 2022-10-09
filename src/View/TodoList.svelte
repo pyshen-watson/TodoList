@@ -14,6 +14,9 @@
         todolist = [taskInput, ...todolist]
         taskInput = ""
     }
+    const deleteTask = (e:CustomEvent) => {
+        todolist = todolist.filter(task => task!==e.detail)
+    }
     const keypress = (event) => {
         if(event.key === 'Enter'){
             addTask()
@@ -28,7 +31,9 @@
         <button on:click={addTask}>Add</button>
     </div>
     {#each todolist as todo}
-        <Todo task={todo} />
+        <Todo task={todo} on:deleteTask={deleteTask}/>
+    {:else}
+        <div class="no-task">No task</div>
     {/each}
 </div>
 
@@ -44,6 +49,7 @@
         border-radius: 15px;
         padding: 5%;
         font-size: 2rem;
+        text-align: center;
 
         input{
             font-size: inherit;
@@ -55,6 +61,10 @@
             padding: 5px;
             border-radius: 5px;
             background-color: rgba(black, 0.3);
+        }
+
+        .no-task{
+            margin-top: 50%;
         }
     }
 
