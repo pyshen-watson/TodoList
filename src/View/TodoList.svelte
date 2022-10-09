@@ -1,25 +1,64 @@
 <script lang="ts">
     import TodoItem from "./TodoItem.svelte"
-    import { getTodos } from "../Data/store"
+    import db from "../Data/db"
+    import { uuidv4 } from "@firebase/util"
+    import { doc, getDoc, setDoc, deleteDoc, collection, onSnapshot  } from "firebase/firestore"
+    import type { DocumentData} from "firebase/firestore"
 
+    let todoList = []
+    let taskInput = ""
 
-    let todoPromise = getTodos()
-    let taskInput: string
+    const unsubscribe = onSnapshot(collection(db, "todos"), (querySnapshot) => {
+
+        let dbTodoList = []
+
+        querySnapshot.forEach((doc) => {
+            let todo = doc.data()
+            dbTodoList.push(todo)
+        })
+
+        todoList = dbTodoList
+    })
 
     const addTask = () => {
 
-        // if(taskInput === ""){
-        //     alert("Task can't be empty.")
-        //     return
-        // }
+        if(taskInput === ""){
+            alert("Task can't be empty.")
+            return
+        }
 
-        // todolist = [taskInput, ...todolist]
-        // taskInput = ""
+        let id = uuidv4()
+        setDoc(doc(db, 'todos', id), {
+            id: id,
+            task: taskInput,
+            isCompleted: false,
+        })
+
+        taskInput = ""
     }
+
+    const completeTask = (e:CustomEvent) => {
+
+        let origin: DocumentData
+        const taskDoc = doc(db, 'todos', e.detail)
+
+        getDoc(taskDoc)
+        .then((res) => {
+            origin = res.data()
+            setDoc(doc(db, 'todos', e.detail),
+                { isCompleted:!origin.isCompleted },
+                { merge: true }
+            )
+        })
+
+    }
+
     const deleteTask = (e:CustomEvent) => {
-        // todolist = todolist.filter(task => task!==e.detail)
+        deleteDoc(doc(db, 'todos', e.detail))
     }
-    const keypress = (event) => {
+
+    const keypress = (event: any) => {
+
         if(event.key === 'Enter'){
             addTask()
         }
@@ -34,13 +73,17 @@
         <button on:click={addTask}>Add</button>
     </div>
 
-    {#await todoPromise then todolist}
-        {#each todolist as todo}
-            <TodoItem task={todo.task} on:deleteTask={deleteTask}/>
-        {:else}
-            <div class="no-task">No task</div>
-        {/each}
-    {/await}
+    {#each todoList as todo}
+        <TodoItem
+            id={todo.id}
+            task={todo.task}
+            isCompleted={todo.isCompleted}
+            on:completeTask={completeTask}
+            on:deleteTask={deleteTask}
+        />
+    {:else}
+        <div class="no-task">No task</div>
+    {/each}
 
 </div>
 
