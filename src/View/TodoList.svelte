@@ -14,7 +14,6 @@
         todolist = [taskInput, ...todolist]
         taskInput = ""
     }
-
     const keypress = (event) => {
         if(event.key === 'Enter'){
             addTask()
