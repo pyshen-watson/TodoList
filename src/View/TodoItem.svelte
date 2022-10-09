@@ -29,7 +29,7 @@
 <style lang="scss">
     .main{
         padding: 1rem;
-        margin: 1rem 0rem;
+        margin: 1rem;
         border-radius: 15px;
         background-color: rgba(black, 0.3);
         cursor: pointer;

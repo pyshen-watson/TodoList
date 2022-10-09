@@ -17,7 +17,7 @@
             dbTodoList.push(todo)
         })
 
-        todoList = dbTodoList
+        todoList = dbTodoList.reverse()
     })
 
     const addTask = () => {
@@ -73,17 +73,20 @@
         <button on:click={addTask}>Add</button>
     </div>
 
-    {#each todoList as todo}
-        <TodoItem
+
+    <div class="list">
+        {#each todoList as todo}
+            <TodoItem
             id={todo.id}
             task={todo.task}
             isCompleted={todo.isCompleted}
-            on:completeTask={completeTask}
-            on:deleteTask={deleteTask}
-        />
-    {:else}
-        <div class="no-task">No task</div>
-    {/each}
+                on:completeTask={completeTask}
+                on:deleteTask={deleteTask}
+            />
+        {:else}
+            <div class="no-task">No task</div>
+        {/each}
+    </div>
 
 </div>
 
@@ -91,19 +94,42 @@
 
 <style lang="scss">
 
+    @mixin pad{
+        @media(max-width:768px){
+        @content;
+        }
+    }
+    @mixin mobile{
+        @media(max-width:475px){
+        @content;
+        }
+    }
+
     .main{
         background-color: rgba(gray, 0.7);
-        height: 60vh;
+        height: 80vh;
         width: 100%;
-        overflow-y: scroll;
         border-radius: 15px;
         padding: 5%;
-        font-size: 2rem;
         text-align: center;
+        font-size: 1.5rem;
+
+        @include pad{
+            font-size: 1.25rem;
+            height: 60vh;
+        }
+
+        @include mobile{
+            font-size: 1rem;
+            height: 60vh;
+        }
 
         input{
             font-size: inherit;
             padding: 5px;
+            margin-bottom: 10px;
+            width: 80%;
+
         }
 
         button{
@@ -111,6 +137,11 @@
             padding: 5px;
             border-radius: 5px;
             background-color: rgba(black, 0.3);
+        }
+
+        .list{
+            max-height: 85%;
+            overflow-y: scroll;
         }
 
         .no-task{
